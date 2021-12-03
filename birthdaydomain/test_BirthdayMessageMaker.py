@@ -28,11 +28,15 @@ class BirthdayMessenger:
         self.get_employee_names_and_birthdates = get_employee_names_and_birthdates
 
     def send_birthday_greeting(self):
-        first_employee = self.get_employee_names_and_birthdates.do()[0]
-        is_employee_birthday_today = first_employee.birthdate == TODAY
-        if is_employee_birthday_today:
-            return BirthdayMessage("Happy birthday!", f"Happy birthday, dear {first_employee.name}!")
-        return BirthdayMessage("", "")
+        employees = self.get_employee_names_and_birthdates.do()
+
+        messages = BirthdayMessage("", "")
+        for employee in employees:
+            is_employee_birthday_today = employee.birthdate == TODAY
+            if is_employee_birthday_today:
+                return BirthdayMessage("Happy birthday!", f"Happy birthday, dear {employee.name}!")
+
+        return messages
 
 
 class Test(TestCase):
@@ -53,6 +57,6 @@ class Test(TestCase):
         employee1 = Employee("GeePaw", TODAY)
         employee2 = Employee("John", datetime.datetime.today())
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1])
-        self.assertEqual(BirthdayMessage("Happy birthday!", "Happy birthday, dear GeePaw!"),
-                          #BirthdayMessage("Happy birthday!", "Happy birthday, dear John!"),
+        self.assertEqual([BirthdayMessage("Happy birthday!", "Happy birthday, dear GeePaw!"),
+                          BirthdayMessage("Happy birthday!", "Happy birthday, dear John!")],
                          BirthdayMessenger(get_employee_name_and_birthdate).send_birthday_greeting())
