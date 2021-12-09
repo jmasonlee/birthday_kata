@@ -40,6 +40,8 @@ class TestGetEmployeeNameAndBirthdates(GetEmployeeNamesAndBirthdates):
 
 
 class DateCompare:
+    def today(self):
+        return datetime.datetime.today().date()
 
     def is_birthday_today(self, birthdate):
         return birthdate == today()
