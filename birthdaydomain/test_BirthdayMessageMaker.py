@@ -41,6 +41,7 @@ class TestGetEmployeeNameAndBirthdates(GetEmployeeNamesAndBirthdates):
 
 class BirthdayMessenger:
     def __init__(self, get_employee_names_and_birthdates, send_email):
+        self.date_compare = DateCompare()
         self.get_employee_names_and_birthdates = get_employee_names_and_birthdates
         self.send_email = send_email
 
@@ -49,7 +50,6 @@ class BirthdayMessenger:
 
         messages = []
         for employee in employees:
-            self.date_compare = DateCompare()
             is_employee_birthday_today = self.date_compare.is_birthday_today(employee.birthdate)
             if is_employee_birthday_today:
                 messages.append(BirthdayMessage("Happy birthday!", f"Happy birthday, dear {employee.name}!"))
