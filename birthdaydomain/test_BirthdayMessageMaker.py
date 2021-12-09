@@ -49,17 +49,18 @@ class BirthdayMessenger:
 
         messages = []
         for employee in employees:
-            is_employee_birthday_today = self.is_birthday_today(employee.birthdate)
+            self.date_compare = DateCompare()
+            is_employee_birthday_today = self.date_compare.is_birthday_today(employee.birthdate)
             if is_employee_birthday_today:
                 messages.append(BirthdayMessage("Happy birthday!", f"Happy birthday, dear {employee.name}!"))
 
         self.send_email.do(messages)
 
-    def is_birthday_today(self, birthdate):
-        return birthdate == today()
 
 class DateCompare:
-    pass
+
+    def is_birthday_today(self, birthdate):
+        return birthdate == today()
 
 
 class Test(TestCase):
