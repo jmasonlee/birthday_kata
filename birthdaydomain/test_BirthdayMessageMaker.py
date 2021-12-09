@@ -39,9 +39,14 @@ class TestGetEmployeeNameAndBirthdates(GetEmployeeNamesAndBirthdates):
         return self.employees
 
 
+class DateCompare:
+
+    def is_birthday_today(self, birthdate):
+        return birthdate == today()
+
 class BirthdayMessenger:
-    def __init__(self, get_employee_names_and_birthdates, send_email):
-        self.date_compare = DateCompare()
+    def __init__(self, get_employee_names_and_birthdates, send_email, compare=DateCompare()):
+        self.date_compare = compare
         self.get_employee_names_and_birthdates = get_employee_names_and_birthdates
         self.send_email = send_email
 
@@ -55,12 +60,6 @@ class BirthdayMessenger:
                 messages.append(BirthdayMessage("Happy birthday!", f"Happy birthday, dear {employee.name}!"))
 
         self.send_email.do(messages)
-
-
-class DateCompare:
-
-    def is_birthday_today(self, birthdate):
-        return birthdate == today()
 
 
 class Test(TestCase):
