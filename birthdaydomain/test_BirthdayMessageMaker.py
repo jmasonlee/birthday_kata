@@ -3,11 +3,6 @@ from abc import abstractmethod, ABC
 from collections import namedtuple
 from unittest import TestCase
 
-
-def today():
-    return datetime.datetime.today().date()
-
-
 BirthdayMessage = namedtuple("BirthdayMessage", "subject message")
 Employee = namedtuple("Employee", "name birthdate")
 
@@ -44,7 +39,7 @@ class DateCompare:
         return datetime.datetime.today().date()
 
     def is_birthday_today(self, birthdate):
-        return birthdate == today()
+        return birthdate == DateCompare().today()
 
 class BirthdayMessenger:
     def __init__(self, get_employee_names_and_birthdates, send_email, compare=DateCompare()):
@@ -67,7 +62,7 @@ class BirthdayMessenger:
 class Test(TestCase):
 
     def test_send_birthday_message_for_employees_with_birthday_today(self):
-        employee1 = Employee("John", today())
+        employee1 = Employee("John", DateCompare().today())
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1])
 
         send_email = TestSendEmail()
@@ -86,8 +81,8 @@ class Test(TestCase):
         self.assertEqual([], send_email.email_messages)
 
     def test_send_birthday_message_to_multiple_employees(self):
-        employee1 = Employee("GeePaw", today())
-        employee2 = Employee("John", today())
+        employee1 = Employee("GeePaw", DateCompare().today())
+        employee2 = Employee("John", DateCompare().today())
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1, employee2])
         send_email = TestSendEmail()
 
@@ -98,8 +93,8 @@ class Test(TestCase):
                          send_email.email_messages)
 
     def test_send_birthday_message_to_multiple_employees_more_than_5_years_old(self):
-        employee1 = Employee("GeePaw", today())
-        employee2 = Employee("John", today())
+        employee1 = Employee("GeePaw", DateCompare().today())
+        employee2 = Employee("John", DateCompare().today())
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1, employee2])
         send_email = TestSendEmail()
 
