@@ -3,7 +3,10 @@ from abc import abstractmethod, ABC
 from collections import namedtuple
 from unittest import TestCase
 
-TODAY = datetime.datetime.today().date()
+
+def today():
+    return datetime.datetime.today().date()
+
 
 BirthdayMessage = namedtuple("BirthdayMessage", "subject message")
 Employee = namedtuple("Employee", "name birthdate")
@@ -24,7 +27,7 @@ class TestGetEmployeeNameAndBirthdates(GetEmployeeNamesAndBirthdates):
 
 
 class BirthdayMessenger:
-    def __init__(self, get_employee_names_and_birthdates):
+    def __init__(self, get_employee_names_and_birthdates, send_email):
         self.get_employee_names_and_birthdates = get_employee_names_and_birthdates
 
     def send_birthday_greeting(self):
@@ -32,26 +35,34 @@ class BirthdayMessenger:
 
         messages = BirthdayMessage("", "")
         for employee in employees:
-            is_employee_birthday_today = employee.birthdate == TODAY
+            is_employee_birthday_today = self.is_birthday_today(employee.birthdate)
             if is_employee_birthday_today:
-                return BirthdayMessage("Happy birthday!", f"Happy birthday, dear {employee.name}!")
+                messages.append(BirthdayMessage("Happy birthday!", f"Happy birthday, dear {employee.name}!"))
 
         return messages
+
 
 
 class Test(TestCase):
 
     def test_send_birthday_message_for_employees_with_birthday_today(self):
-        employee1 = Employee("John", TODAY)
+        employee1 = Employee("John", today())
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1])
-        expectedOutput = BirthdayMessage("Happy birthday!", "Happy birthday, dear John!")
-        self.assertEqual(expectedOutput, BirthdayMessenger(get_employee_name_and_birthdate).send_birthday_greeting())
+
+        send_email = TestSendEmail()
+        BirthdayMessenger(get_employee_name_and_birthdate, send_email).send_birthday_greeting()
+
+        self.assertEqual([(BirthdayMessage("Happy birthday!", "Happy birthday, dear John!"))],
+                         send_email.email_messages)
 
     def test_do_not_send_birthday_message_for_employees_with_birthday_not_today(self):
         employee1 = Employee("John", datetime.datetime(2010, 1, 1))
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1])
-        self.assertEqual(BirthdayMessage("", ""),
-                         BirthdayMessenger(get_employee_name_and_birthdate).send_birthday_greeting())
+        send_email = TestSendEmail()
+
+        BirthdayMessenger(get_employee_name_and_birthdate, send_email).send_birthday_greeting()
+
+        self.assertEqual([], send_email.email_messages)
 
     def test_send_birthday_message_to_multiple_employees(self):
         employee1 = Employee("GeePaw", TODAY)
@@ -59,4 +70,16 @@ class Test(TestCase):
         get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1])
         self.assertEqual([BirthdayMessage("Happy birthday!", "Happy birthday, dear GeePaw!"),
                           BirthdayMessage("Happy birthday!", "Happy birthday, dear John!")],
-                         BirthdayMessenger(get_employee_name_and_birthdate).send_birthday_greeting())
+                         send_email.email_messages)
+
+    def test_send_birthday_message_to_multiple_employees_more_than_5_years_old(self):
+        employee1 = Employee("GeePaw", today())
+        employee2 = Employee("John", today())
+        get_employee_name_and_birthdate = TestGetEmployeeNameAndBirthdates([employee1, employee2])
+        send_email = TestSendEmail()
+
+        BirthdayMessenger(get_employee_name_and_birthdate, send_email).send_birthday_greeting()
+
+        self.assertEqual([BirthdayMessage("Happy birthday!", "Happy birthday, dear GeePaw!"),
+                          BirthdayMessage("Happy birthday!", "Happy birthday, dear John!")],
+                         send_email.email_messages)
